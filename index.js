@@ -8,70 +8,19 @@ c.fillRect(0,0, canvas.width, canvas.height)
 
 const gravity = 0.7
 
-class Sprite {
 
-	constructor({position,velocity, color = 'red', offset}){
-		this.position = position
-		this.velocity = velocity
-		this.width = 50
-		this.height = 150
-		this.lastKey
-		this.attackBox = {
-			position: {
-				x: this.position.x,
-				y: this.position.y
+const background = new Sprite({
+	position:{
+		x:0,
+		y:0
+	},
+	imageSrc: './img/Background.png'
+})
 
-			},
-			offset,
-			width: 100,
-			height: 50
-
-		}
-		this.color = color
-		this.isAttacking 
-	}
-	draw(){
-		c.fillStyle = this.color;
-		c.fillRect(this.position.x, this.position.y,this.width, this.height)
-
-		//CAJA ATAQUE
-		if(this.isAttacking){
-		c.fillStyle = 'green'
-		c.fillRect(this.attackBox.position.x, 
-			this.attackBox.position.y,
-			this.attackBox.width, 
-			this.attackBox.height )
-		}
-		
-	}
-
-	update(){
-		this.draw()
-		this.attackBox.position.x = this.position.x + this.attackBox.offset.x
-		this.attackBox.position.y = this.position.y
-
-		this.position.x += this.velocity.x
-		this.position.y += this.velocity.y
-
-
-		if(this.position.y + this.height + this.velocity.y >= canvas.height){
-			this.velocity.y= 0;
-		}else 	this.velocity.y += gravity
-	}
-
-	//ATACANDO 
-	attack(){
-		this.isAttacking = true
-		setTimeout(()=>{
-			this.isAttacking = false
-		},100)
-
-	}
-}
 
 //Creacion de Personajes
 
-const player = new Sprite({
+const player = new Fight({
 position:{
 	x:0,
 	y:0
@@ -83,10 +32,17 @@ velocity:{
   offset:{
   	x:0,
   	y:0
+  },
+  imageSrc: './img/Goblin/Idle.png',
+  framesMax: 4,
+  scale: 5,
+  offset:{
+  	x:215,
+  	y:180
   }
 })
 
-const player2 = new Sprite({
+const player2 = new Fight({
 position:{
 	x:400,
 	y:100
@@ -121,15 +77,10 @@ const keys = {
 	}
 }
 
-function rectangularCollision({rectangle1, rectangle2}){
-return(
-	player.attackBox.position.x + player.attackBox.width >= player2.attackBox.position.x && 
-	player.attackBox.position.x <= player2.position.x + player2.width &&
-	player.attackBox.position.y + player.attackBox.height >= player2.position.y &&
-	player.attackBox.position.y <= player2.position.y + player2.height)
 
 
-}
+decreaseTimer()
+
 //Animaciones
 function animate(){
 	window.requestAnimationFrame(animate)
@@ -137,10 +88,11 @@ function animate(){
 	//limpiar la pantalla 
 	c.fillStyle = 'black'
 	c.fillRect(0,0,canvas.width, canvas.height)
-
+	//CrearFondo
+	background.update();
 	//Crear Sprite
 	player.update();
-	player2.update();
+	//player2.update();
 
 	player.velocity.x = 0
 	player2.velocity.x = 0
@@ -172,7 +124,8 @@ function animate(){
 		rectangle2:player2
 	}) && player.isAttacking){
 		player.isAttacking = false
-		console.log("ATACADO");
+		player2.health -= 5
+		document.querySelector('#HealthP2').style.width = player2.health + '%'
 	}
 	//ATAQUE PLAYER 2
 	if(rectangularCollision({
@@ -180,11 +133,14 @@ function animate(){
 		rectangle2:player
 	}) && player2.isAttacking){
 		player2.isAttacking = false
-		console.log("ATACADO PLAYER2");
+		player.health -= 5
+		document.querySelector('#HealthP').style.width = player.health + '%'
 	}
 
 
-
+	if(player.health <= 0 || player2.health <= 0){
+		determineWinner({player,player2,timerId})
+	}
 
 		
 
