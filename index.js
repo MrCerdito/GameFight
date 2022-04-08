@@ -10,19 +10,46 @@ const gravity = 0.7
 
 class Sprite {
 
-	constructor({position,velocity}){
+	constructor({position,velocity, color = 'red', offset}){
 		this.position = position
 		this.velocity = velocity
+		this.width = 50
 		this.height = 150
 		this.lastKey
+		this.attackBox = {
+			position: {
+				x: this.position.x,
+				y: this.position.y
+
+			},
+			offset,
+			width: 100,
+			height: 50
+
+		}
+		this.color = color
+		this.isAttacking 
 	}
 	draw(){
-		c.fillStyle = 'red';
-		c.fillRect(this.position.x, this.position.y, 50, this.height)
+		c.fillStyle = this.color;
+		c.fillRect(this.position.x, this.position.y,this.width, this.height)
+
+		//CAJA ATAQUE
+		if(this.isAttacking){
+		c.fillStyle = 'green'
+		c.fillRect(this.attackBox.position.x, 
+			this.attackBox.position.y,
+			this.attackBox.width, 
+			this.attackBox.height )
+		}
+		
 	}
 
 	update(){
 		this.draw()
+		this.attackBox.position.x = this.position.x + this.attackBox.offset.x
+		this.attackBox.position.y = this.position.y
+
 		this.position.x += this.velocity.x
 		this.position.y += this.velocity.y
 
@@ -30,6 +57,15 @@ class Sprite {
 		if(this.position.y + this.height + this.velocity.y >= canvas.height){
 			this.velocity.y= 0;
 		}else 	this.velocity.y += gravity
+	}
+
+	//ATACANDO 
+	attack(){
+		this.isAttacking = true
+		setTimeout(()=>{
+			this.isAttacking = false
+		},100)
+
 	}
 }
 
@@ -43,6 +79,10 @@ position:{
 velocity:{
 	x:0,
 	y:0
+  },
+  offset:{
+  	x:0,
+  	y:0
   }
 })
 
@@ -54,6 +94,11 @@ position:{
 velocity:{
 	x:0,
 	y:0
+  },
+  color: 'blue',
+  offset:{
+  	x:-50,
+  	y:0
   }
 })
 
@@ -76,7 +121,15 @@ const keys = {
 	}
 }
 
+function rectangularCollision({rectangle1, rectangle2}){
+return(
+	player.attackBox.position.x + player.attackBox.width >= player2.attackBox.position.x && 
+	player.attackBox.position.x <= player2.position.x + player2.width &&
+	player.attackBox.position.y + player.attackBox.height >= player2.position.y &&
+	player.attackBox.position.y <= player2.position.y + player2.height)
 
+
+}
 //Animaciones
 function animate(){
 	window.requestAnimationFrame(animate)
@@ -101,13 +154,38 @@ function animate(){
 		player.velocity.x = 10
 	}
 	
+
 	//CONTROL PLAYER 2	
+
 	if(keys.ArrowLeft.pressed && player2.LastKey === 'ArrowLeft'){
 		player2.velocity.x = -10
 		
 	}else if(keys.ArrowRight.pressed && player2.LastKey === 'ArrowRight'){
 		player2.velocity.x = 10
 	}
+
+
+
+	//ATAQUE PLAYER
+	if(rectangularCollision({
+		rectangle1:player,
+		rectangle2:player2
+	}) && player.isAttacking){
+		player.isAttacking = false
+		console.log("ATACADO");
+	}
+	//ATAQUE PLAYER 2
+	if(rectangularCollision({
+		rectangle1:player2,
+		rectangle2:player
+	}) && player2.isAttacking){
+		player2.isAttacking = false
+		console.log("ATACADO PLAYER2");
+	}
+
+
+
+
 		
 
 }
@@ -117,7 +195,6 @@ animate()
 
 // AL PRESIONAR 
 window.addEventListener('keydown', (event) =>{
-	console.log(event);
 	switch (event.key){
 		//PLAYER 1 TECLAS
 		case 'd':
@@ -134,6 +211,11 @@ window.addEventListener('keydown', (event) =>{
 		player.velocity.y = -10;
 		break
 
+		case ' ':
+		player.attack()
+		break
+
+
 		//PLAYER 2 TECLAS
 
 		case 'ArrowLeft':
@@ -149,9 +231,12 @@ window.addEventListener('keydown', (event) =>{
 		case 'ArrowUp':
 		player2.velocity.y = -10;
 		break
+
+		case '1':
+		player2.attack()
+		break
 	}
 
-	console.log(event.key);
 
 })
 
@@ -163,9 +248,12 @@ window.addEventListener('keyup', (event) =>{
 		case 'd':
 		keys.d.pressed = false
 		break
+		
 		case 'a':
 		keys.a.pressed = false
-		breakd
+		break
+
+		
 
 		//PLAYER 2 TECLAS 
 		case 'ArrowLeft':
@@ -175,8 +263,8 @@ window.addEventListener('keyup', (event) =>{
 		case 'ArrowRight':
 		keys.ArrowRight.pressed = false
 		break
-	}
 
-	console.log(event.key);
+		
+	}
 
 })
