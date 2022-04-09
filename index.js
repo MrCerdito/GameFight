@@ -22,7 +22,7 @@ const background = new Sprite({
 
 const player = new Fight({
 position:{
-	x:0,
+	x:100,
 	y:100
 },
 velocity:{
@@ -35,7 +35,7 @@ velocity:{
   },
   imageSrc: './img/Goblin/Idle.png',
   framesMax: 4,
-  scale: 5,
+  scale: 3.5,
   offset:{
   	x:215,
   	y:157
@@ -64,21 +64,31 @@ velocity:{
   		 imageSrc: './img/Goblin/Attack.png',
   		 framesMax:8,
   		 image: new Image()
+  	},
+  	takeHit:{
+  		 imageSrc: './img/Goblin/Hit.png',
+  		 framesMax:4,
+  		 image: new Image()
+  	},
+  	death:{
+  		 imageSrc: './img/Goblin/Death.png',
+  		 framesMax:4,
+  		 image: new Image()
   	}
   },
   attackBox:{
   	offset:{
-  		x:150,
+  		x:100,
   		y:100
   	},
-  	width:200,
+  	width:100,
   	height: 50
   }
 })
 
 const player2 = new Fight({
 position:{
-	x:700,
+	x:800,
 	y:100
 },
 velocity:{
@@ -91,7 +101,7 @@ velocity:{
   },
   imageSrc: './img/Skeleton/Idle.png',
   framesMax: 4,
-  scale: 5,
+  scale: 3.5,
   offset:{
   	x:215,
   	y:157
@@ -120,14 +130,24 @@ velocity:{
   		 imageSrc: './img/Skeleton/Attack.png',
   		 framesMax:8,
   		 image: new Image()
+  	},
+  	takeHit:{
+  		 imageSrc: './img/Skeleton/Hit.png',
+  		 framesMax:4,
+  		 image: new Image()
+  	},
+  	death:{
+  		 imageSrc: './img/Skeleton/Death.png',
+  		 framesMax:4,
+  		 image: new Image()
   	}
   },
   attackBox:{
   	offset:{
-  		x:-50,
+  		x:-110,
   		y:100
   	},
-  	width:200,
+  	width:100,
   	height: 50
   }
 })
@@ -174,12 +194,12 @@ function animate(){
 	//CONTROL PLAYER 1
 
 	if(keys.a.pressed && player.LastKey === 'a'){
-		player.velocity.x = -10
+		player.velocity.x = -5
 		player.switchSprite('run')
 
 
 	}else if(keys.d.pressed && player.LastKey === 'd'){
-		player.velocity.x = 10
+		player.velocity.x = 5
 		player.switchSprite('run')
 	}else{
 		player.switchSprite('idle')
@@ -201,11 +221,11 @@ function animate(){
 	//CONTROL PLAYER 2	
 
 	if(keys.ArrowLeft.pressed && player2.LastKey === 'ArrowLeft'){
-		player2.velocity.x = -10
+		player2.velocity.x = -5
 		player2.switchSprite('run')
 		
 	}else if(keys.ArrowRight.pressed && player2.LastKey === 'ArrowRight'){
-		player2.velocity.x = 10
+		player2.velocity.x = 5
 		player2.switchSprite('run')
 	}else{
 		player2.switchSprite('idle')
@@ -218,8 +238,8 @@ function animate(){
 		rectangle1:player,
 		rectangle2:player2
 	}) && player.isAttacking && player.framesCurrent === 5){
+		player2.takeHit();
 		player.isAttacking = false
-		player2.health -= 5
 		document.querySelector('#HealthP2').style.width = player2.health + '%'
 	}
 
@@ -231,14 +251,20 @@ function animate(){
 
 
 
-	//ATAQUE PLAYER 2
-	if(rectangularCollision({
+	//ATAQUE PLAYER 2 Y RECIBIENDO ATAQUE
+		if(rectangularCollision({
 		rectangle1:player2,
 		rectangle2:player
 	}) && player2.isAttacking && player2.framesCurrent === 4) {
+		player.takeHit();
 		player2.isAttacking = false
-		player.health -= 5
 		document.querySelector('#HealthP').style.width = player.health + '%'
+	}
+
+
+	//no golpe
+	if(player2.isAttacking && player2.framesCurrent === 5){
+		player2.isAttacking = false
 	}
 
 
@@ -255,52 +281,57 @@ animate()
 
 // AL PRESIONAR 
 window.addEventListener('keydown', (event) =>{
-	switch (event.key){
-		//PLAYER 1 TECLAS
-		case 'd':
-		keys.d.pressed = true
-		player.LastKey = 'd'
-		break
+//PLAYER 1 TECLAS
+	if(!player.dead){
+		switch (event.key){
+			
+			case 'd':
+			keys.d.pressed = true
+			player.LastKey = 'd'
+			break
 
-		case 'a':
-		keys.a.pressed = true
-		player.LastKey = 'a'
-		break
+			case 'a':
+			keys.a.pressed = true
+			player.LastKey = 'a'
+			break
 
-		case 'w':
-		if(player.velocity.y === 0){
-			player.velocity.y = -10;
-		}
-		break
+			case 'w':
+			if(player.velocity.y === 0){
+				player.velocity.y = -10;
+			}
+			break
 
-		case ' ':
-		player.attack()
-		break
+			case ' ':
+			player.attack()
+			break
 
-
-		//PLAYER 2 TECLAS
-
-		case 'ArrowLeft':
-		keys.ArrowLeft.pressed = true
-		player2.LastKey = 'ArrowLeft'
-		break
-
-		case 'ArrowRight':
-		keys.ArrowRight.pressed = true
-		player2.LastKey = 'ArrowRight'
-		break
-
-		case 'ArrowUp':
-		if(player2.velocity.y === 0){
-			player2.velocity.y = -10;
-		}
-		break
-
-		case '1':
-		player2.attack()
-		break
 	}
 
+}
+	if(!player2.dead){
+		switch (event.key){
+			case 'ArrowLeft':
+			keys.ArrowLeft.pressed = true
+			player2.LastKey = 'ArrowLeft'
+			break
+
+			case 'ArrowRight':
+			keys.ArrowRight.pressed = true
+			player2.LastKey = 'ArrowRight'
+			break
+
+			case 'ArrowUp':
+			if(player2.velocity.y === 0){
+				player2.velocity.y = -10;
+			}
+			break
+			case '1':
+			player2.attack()
+			break
+	}
+	
+		
+}
 
 })
 

@@ -2,11 +2,16 @@
 	<style>
 		*{
 			box-sizing: border-box;
+			font-family: 'Press Start 2P', cursive;
 		}
 	</style>
+
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
 </head>
 
-<body>
+<body style="">
 	<!-- red container div -->
 <div  style="position: relative; display: inline-block;">
 	<div style="
@@ -19,11 +24,16 @@
 	">
 
 		<!-- VIDA PLAYER 1-->
-		<div style="position: relative;   width:100%; display: flex; justify-content: flex-end;">
-		<div style="background-color:yellow; height:30px; width:100%; "></div>
+		<div style="
+			position: relative;   
+			width:100%; 
+			display: flex; 
+			justify-content: flex-end;
+			border:4px solid white">
+		<div style="background-color:red; height:30px; width:100%; "></div>
 		<div id="HealthP" style="
 			position: absolute; 
-			background:blue; 
+			background:#818CF8; 
 			top: 0; 
 			right: 0; 
 			bottom: 0;
@@ -36,24 +46,35 @@
 
 		<!-- TIEMPO-->
 		<div id="timer" style="
-		background-color:red; 
-		height:100px; 
+		background-color:black; 
+		height:50px; 
 		width:100px; 
 		flex-shrink:0;
 		display:flex;
+		border:  4px solid white;
 		align-items: center;
 		justify-content: center;
+		color: white;
 		">10</div>
 
 		<!-- VIDA PLAYER 2-->
-		<div style="position: relative;   width:100%;">
-		<div style="background-color:yellow; height:30px"></div>
-		<div id="HealthP2" style="position: absolute; background:blue; top: 0; right: 0; left: 0; bottom: 0;"></div></div>
+		<div style="position: relative;   width:100%; border:4px solid white">
+		<div style="background-color:red; height:30px"></div>
+		<div id="HealthP2" style="
+			position: absolute; 
+			background:#818CF8; 
+			top: 0; 
+			right: 0; 
+			left: 0; 
+			bottom: 0;">
+		</div></div>
 		<div></div>
 	</div>
 	<div
 	id="displayText"
 	style="
+	font-weight: bold;
+    font-size: 42px;
 	position: absolute;
 	color: white;
 	display: flex;
