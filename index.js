@@ -23,7 +23,7 @@ const background = new Sprite({
 const player = new Fight({
 position:{
 	x:0,
-	y:0
+	y:100
 },
 velocity:{
 	x:0,
@@ -38,23 +38,97 @@ velocity:{
   scale: 5,
   offset:{
   	x:215,
-  	y:180
+  	y:157
+  },
+  sprites:{
+  	idle:{
+  		 imageSrc: './img/Goblin/Idle.png',
+  		 framesMax:4
+  	},
+  	run:{
+  		 imageSrc: './img/Goblin/Run.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	},
+  	jump:{
+  		 imageSrc: './img/Goblin/Run.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	},
+  	fall:{
+  		 imageSrc: './img/Goblin/Run.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	},
+  	attack1:{
+  		 imageSrc: './img/Goblin/Attack.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	}
+  },
+  attackBox:{
+  	offset:{
+  		x:150,
+  		y:100
+  	},
+  	width:200,
+  	height: 50
   }
 })
 
 const player2 = new Fight({
 position:{
-	x:400,
+	x:700,
 	y:100
 },
 velocity:{
 	x:0,
 	y:0
   },
-  color: 'blue',
   offset:{
   	x:-50,
   	y:0
+  },
+  imageSrc: './img/Skeleton/Idle.png',
+  framesMax: 4,
+  scale: 5,
+  offset:{
+  	x:215,
+  	y:157
+  },
+  sprites:{
+  	idle:{
+  		 imageSrc: './img/Skeleton/Idle.png',
+  		 framesMax:4
+  	},
+  	run:{
+  		 imageSrc: './img/Skeleton/Walk.png',
+  		 framesMax:4,
+  		 image: new Image()
+  	},
+  	jump:{
+  		 imageSrc: './img/Skeleton/Run.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	},
+  	fall:{
+  		 imageSrc: './img/Skeleton/Run.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	},
+  	attack1:{
+  		 imageSrc: './img/Skeleton/Attack.png',
+  		 framesMax:8,
+  		 image: new Image()
+  	}
+  },
+  attackBox:{
+  	offset:{
+  		x:-50,
+  		y:100
+  	},
+  	width:200,
+  	height: 50
   }
 })
 
@@ -92,7 +166,7 @@ function animate(){
 	background.update();
 	//Crear Sprite
 	player.update();
-	//player2.update();
+	player2.update();
 
 	player.velocity.x = 0
 	player2.velocity.x = 0
@@ -101,19 +175,40 @@ function animate(){
 
 	if(keys.a.pressed && player.LastKey === 'a'){
 		player.velocity.x = -10
-		
+		player.switchSprite('run')
+
+
 	}else if(keys.d.pressed && player.LastKey === 'd'){
 		player.velocity.x = 10
+		player.switchSprite('run')
+	}else{
+		player.switchSprite('idle')
 	}
 	
+
+
+	//salto y caida
+	if(player.velocity.y < 0 ){
+		//Sprite salto
+	}else if (player.velocity.y > 0){
+		//Sprite caida
+	}
+
+
+
+
 
 	//CONTROL PLAYER 2	
 
 	if(keys.ArrowLeft.pressed && player2.LastKey === 'ArrowLeft'){
 		player2.velocity.x = -10
+		player2.switchSprite('run')
 		
 	}else if(keys.ArrowRight.pressed && player2.LastKey === 'ArrowRight'){
 		player2.velocity.x = 10
+		player2.switchSprite('run')
+	}else{
+		player2.switchSprite('idle')
 	}
 
 
@@ -122,16 +217,25 @@ function animate(){
 	if(rectangularCollision({
 		rectangle1:player,
 		rectangle2:player2
-	}) && player.isAttacking){
+	}) && player.isAttacking && player.framesCurrent === 5){
 		player.isAttacking = false
 		player2.health -= 5
 		document.querySelector('#HealthP2').style.width = player2.health + '%'
 	}
+
+
+	//no golpe
+	if(player.isAttacking && player.framesCurrent === 5){
+		player.isAttacking = false
+	}
+
+
+
 	//ATAQUE PLAYER 2
 	if(rectangularCollision({
 		rectangle1:player2,
 		rectangle2:player
-	}) && player2.isAttacking){
+	}) && player2.isAttacking && player2.framesCurrent === 4) {
 		player2.isAttacking = false
 		player.health -= 5
 		document.querySelector('#HealthP').style.width = player.health + '%'
@@ -164,7 +268,9 @@ window.addEventListener('keydown', (event) =>{
 		break
 
 		case 'w':
-		player.velocity.y = -10;
+		if(player.velocity.y === 0){
+			player.velocity.y = -10;
+		}
 		break
 
 		case ' ':
@@ -185,7 +291,9 @@ window.addEventListener('keydown', (event) =>{
 		break
 
 		case 'ArrowUp':
-		player2.velocity.y = -10;
+		if(player2.velocity.y === 0){
+			player2.velocity.y = -10;
+		}
 		break
 
 		case '1':
